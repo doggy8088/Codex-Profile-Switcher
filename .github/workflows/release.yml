@@ -16,7 +16,7 @@ jobs:
     env:
       APP_NAME: Codex Profiles
       PROJECT_PATH: Codex Profile Switcher.xcodeproj
-      TARGET_NAME: CodexProfileSwitcher
+      SCHEME_NAME: CodexProfileSwitcher
       APPLE_CERTIFICATE_BASE64: ${{ secrets.APPLE_DEVELOPER_ID_CERTIFICATE_BASE64 }}
       APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_DEVELOPER_ID_CERTIFICATE_PASSWORD }}
       APPLE_ID: ${{ secrets.APPLE_ID }}
@@ -59,7 +59,7 @@ jobs:
 
           xcodebuild \
             -project "$PROJECT_PATH" \
-            -target "$TARGET_NAME" \
+            -scheme "$SCHEME_NAME" \
             -configuration Release \
             -derivedDataPath build/DerivedData \
             "${SIGNING_ARGS[@]}" \
@@ -103,4 +103,3 @@ jobs:
             "$ZIP_PATH.sha256" \
             --title "$GITHUB_REF_NAME" \
             --notes "Release build for ${APP_NAME} ${VERSION}."
-

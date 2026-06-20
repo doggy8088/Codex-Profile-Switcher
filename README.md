@@ -44,10 +44,10 @@ xcodebuild -project "Codex Profile Switcher.xcodeproj" -scheme CodexProfileSwitc
 
 ## Install With Homebrew
 
-This repository is also structured as a public Homebrew tap. After a release has been published, install the app with:
+After a release has been published, install the app with:
 
 ```sh
-brew install --cask JakobStadlhuber/codex-profile-switcher/codex-profile-switcher
+brew tap JakobStadlhuber/codex-profile-switcher https://github.com/JakobStadlhuber/Codex-Profile-Switcher && brew install --cask codex-profile-switcher
 ```
 
 ## Releases
