@@ -18,7 +18,6 @@ struct CodexProfileSwitcherApp: App {
 
         Window("Codex Profile Manager", id: "profile-manager") {
             ProfileManagerView()
-                .environmentObject(loginItemStore)
                 .environmentObject(store)
                 .frame(minWidth: 820, minHeight: 560)
         }
@@ -96,7 +95,6 @@ struct ProfileMenuView: View {
 }
 
 struct ProfileManagerView: View {
-    @EnvironmentObject private var loginItemStore: LoginItemStore
     @EnvironmentObject private var store: ProfileStore
     @State private var selectedProfileID: UUID?
 
@@ -172,23 +170,6 @@ struct ProfileManagerView: View {
                 }
                 .buttonStyle(.borderless)
                 .padding(10)
-
-                Divider()
-
-                VStack(alignment: .leading, spacing: 8) {
-                    Toggle("Launch at Login", isOn: Binding(
-                        get: { loginItemStore.isEnabled },
-                        set: { loginItemStore.setEnabled($0) }
-                    ))
-
-                    if let message = loginItemStore.statusMessage {
-                        Text(message)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                .padding(.horizontal, 14)
-                .padding(.vertical, 12)
             }
             .navigationSplitViewColumnWidth(min: 230, ideal: 280)
         } detail: {
@@ -210,7 +191,6 @@ struct ProfileManagerView: View {
         }
         .onAppear {
             selectedProfileID = selectedProfileID ?? store.activeProfileID ?? store.profiles.first?.id
-            loginItemStore.refresh()
         }
     }
 }
@@ -659,6 +639,5 @@ struct ProfileSwitcherState: Codable {
 
 #Preview {
     ProfileManagerView()
-        .environmentObject(LoginItemStore())
         .environmentObject(ProfileStore())
 }
