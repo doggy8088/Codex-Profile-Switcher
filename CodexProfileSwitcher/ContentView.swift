@@ -52,7 +52,7 @@ struct ProfileMenuView: View {
                     HStack {
                         Text(profile.name)
                         if store.activeProfileID == profile.id {
-                            Text("Active")
+                            Image(systemName: "checkmark")
                         }
                     }
                 }
