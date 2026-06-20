@@ -75,6 +75,9 @@ struct ProfileMenuView: View {
                 NSApp.terminate(nil)
             }
         }
+        .onAppear {
+            store.refreshActiveProfile()
+        }
     }
 }
 
@@ -360,7 +363,6 @@ final class ProfileStore: ObservableObject {
         ensureDirectories()
         reload()
         bootstrapIfNeeded()
-        detectActiveProfile()
     }
 
     func path(for profile: CodexProfile) -> URL {
@@ -381,8 +383,7 @@ final class ProfileStore: ObservableObject {
             .compactMap(loadProfile)
             .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
 
-        activeProfileID = readActiveProfileID()
-        detectActiveProfile()
+        refreshActiveProfile()
     }
 
     @discardableResult
@@ -484,6 +485,20 @@ final class ProfileStore: ObservableObject {
         }
     }
 
+    func refreshActiveProfile() {
+        guard let currentConfig = try? String(contentsOf: configURL, encoding: .utf8) else {
+            restoreLastAppliedProfile()
+            return
+        }
+
+        if let matchingProfile = profiles.first(where: { $0.contents == currentConfig }) {
+            activeProfileID = matchingProfile.id
+            writeActiveProfileID(matchingProfile.id)
+        } else {
+            restoreLastAppliedProfile()
+        }
+    }
+
     private func bootstrapIfNeeded() {
         guard profiles.isEmpty, FileManager.default.fileExists(atPath: configURL.path) else { return }
         createProfileFromCurrentConfig()
@@ -517,21 +532,6 @@ final class ProfileStore: ObservableObject {
             fileName: fileName,
             updatedAt: values?.contentModificationDate ?? Date.distantPast
         )
-    }
-
-    private func detectActiveProfile() {
-        guard let currentConfig = try? String(contentsOf: configURL, encoding: .utf8) else {
-            activeProfileID = readActiveProfileID()
-            return
-        }
-
-        if let matchingProfile = profiles.first(where: { $0.contents == currentConfig }) {
-            activeProfileID = matchingProfile.id
-            writeActiveProfileID(matchingProfile.id)
-        } else {
-            activeProfileID = nil
-            writeActiveProfileID(nil)
-        }
     }
 
     private func openCodex() {
@@ -611,6 +611,19 @@ final class ProfileStore: ObservableObject {
         }
 
         return String(format: "00000000-0000-4000-8000-%012llx", hash & 0xffffffffffff)
+    }
+
+    private func restoreLastAppliedProfile() {
+        guard
+            let storedProfileID = readActiveProfileID(),
+            profiles.contains(where: { $0.id == storedProfileID })
+        else {
+            activeProfileID = nil
+            writeActiveProfileID(nil)
+            return
+        }
+
+        activeProfileID = storedProfileID
     }
 
     private func readActiveProfileID() -> UUID? {
