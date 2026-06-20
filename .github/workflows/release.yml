@@ -103,6 +103,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            echo "Release $GITHUB_REF_NAME already exists; skipping release creation."
+            exit 0
+          fi
+
           gh release create "$GITHUB_REF_NAME" \
             "$ZIP_PATH" \
             "$ZIP_PATH.sha256" \
