@@ -1,6 +1,6 @@
 # Codex Profile Switcher
 
-A macOS menu bar app for switching between local Codex CLI configuration profiles.
+A macOS menu bar app for switching between multiple Codex setups, including separate ChatGPT/OpenAI accounts and API provider profiles for Azure OpenAI, Ollama, and other compatible backends.
 
 It stores profile snapshots in `~/.codex/profile-switcher/profiles` and applies a selected profile by writing it to `~/.codex/config.toml`, then restarting Codex.
 
@@ -28,13 +28,13 @@ Profile manager:
 
 ## Features
 
-- Switch between saved Codex configuration profiles from the menu bar.
+- Switch between multiple ChatGPT/OpenAI account logins for Codex.
+- Switch between API-based Codex profiles, such as Azure OpenAI, Ollama, or other provider configurations.
 - Manage, edit, duplicate, and delete profiles in a SwiftUI window.
 - Create a profile from the current `~/.codex/config.toml`.
 - Optionally attach a file-based Codex login snapshot to a profile.
 - Back up `~/.codex/config.toml` before applying a profile.
 - Launch automatically after login from the menu bar toggle.
-- Prevent multiple menu bar instances from running at the same time.
 
 ## Profiles
 
@@ -44,7 +44,7 @@ Profiles are plain TOML files stored here:
 ~/.codex/profile-switcher/profiles
 ```
 
-The filename is used as the display name:
+The filename is used as the display name. Example profile names:
 
 ```text
 OpenAI Account.toml
@@ -83,11 +83,3 @@ From the command line:
 ```sh
 xcodebuild -project "Codex Profile Switcher.xcodeproj" -scheme CodexProfileSwitcher -configuration Debug build
 ```
-
-## Notes
-
-- Codex is expected at `/Applications/Codex.app`.
-- Applying a profile writes to `~/.codex/config.toml`.
-- Applying a profile with an attached login writes to `~/.codex/auth.json`.
-- Automatic launch starts the menu bar app when the user logs in after a reboot.
-- Do not distribute personal profile files, API keys, or generated config backups.
