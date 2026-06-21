@@ -84,6 +84,13 @@ From the command line:
 xcodebuild -project "Codex Profile Switcher.xcodeproj" -scheme CodexProfileSwitcher -configuration Debug build
 ```
 
+Common local tasks are also available through `make`:
+
+```sh
+make build-unsigned
+make test-unsigned
+```
+
 ## License
 
 MIT License. See [LICENSE](LICENSE).

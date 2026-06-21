@@ -78,9 +78,11 @@ jobs:
           ZIP_PATH="build/${APP_NAME// /-}-${VERSION}.zip"
 
           ditto -c -k --keepParent "$APP_PATH" "$ZIP_PATH"
+          SHA256="$(shasum -a 256 "$ZIP_PATH" | awk '{print $1}')"
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
           echo "ZIP_PATH=$ZIP_PATH" >> "$GITHUB_ENV"
-          shasum -a 256 "$ZIP_PATH" > "$ZIP_PATH.sha256"
+          echo "SHA256=$SHA256" >> "$GITHUB_ENV"
+          printf '%s  %s\n' "$SHA256" "$ZIP_PATH" > "$ZIP_PATH.sha256"
 
       - name: Notarize app
         if: ${{ env.APPLE_ID != '' && env.APPLE_TEAM_ID != '' && env.APPLE_APP_SPECIFIC_PASSWORD != '' && env.APPLE_CERTIFICATE_BASE64 != '' }}
@@ -96,7 +98,34 @@ jobs:
 
           xcrun stapler staple "$APP_PATH"
           ditto -c -k --keepParent "$APP_PATH" "$ZIP_PATH"
-          shasum -a 256 "$ZIP_PATH" > "$ZIP_PATH.sha256"
+          SHA256="$(shasum -a 256 "$ZIP_PATH" | awk '{print $1}')"
+          echo "SHA256=$SHA256" >> "$GITHUB_ENV"
+          printf '%s  %s\n' "$SHA256" "$ZIP_PATH" > "$ZIP_PATH.sha256"
+
+      - name: Update Homebrew cask
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin "$DEFAULT_BRANCH"
+          git checkout "$DEFAULT_BRANCH"
+
+          perl -0pi -e "s/version \"[^\"]+\"/version \"$ENV{VERSION}\"/" Casks/codex-profile-switcher.rb
+          perl -0pi -e "s/sha256 \"[a-f0-9]+\"/sha256 \"$ENV{SHA256}\"/" Casks/codex-profile-switcher.rb
+
+          if git diff --quiet -- Casks/codex-profile-switcher.rb; then
+            echo "Cask already matches ${VERSION}."
+            exit 0
+          fi
+
+          git add Casks/codex-profile-switcher.rb
+          commit_msg_file="$(mktemp -t codex-commit-message)"
+          printf 'chore(cask): update to %s\n\nUpdate Homebrew cask version and sha256 for the tagged release.\n' "$VERSION" > "$commit_msg_file"
+          git commit -F "$commit_msg_file"
+          git push origin "HEAD:${DEFAULT_BRANCH}"
 
       - name: Create GitHub release
         env:

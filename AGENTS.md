@@ -8,10 +8,9 @@ This repository contains a small macOS menu bar app built with SwiftUI and an Xc
 - `CodexProfileSwitcher/Assets.xcassets/` contains app icon assets.
 - `Assets/Screenshots/` stores README screenshots.
 - `Casks/codex-profile-switcher.rb` contains the Homebrew cask definition.
+- `CodexProfileSwitcherTests/` contains XCTest coverage for profile persistence behavior.
 - `Codex Profile Switcher.xcodeproj/` contains the Xcode project and scheme metadata.
 - `Makefile` wraps common local development commands.
-
-There is currently no dedicated test target or test directory.
 
 ## Build, Test, and Development Commands
 
@@ -21,6 +20,8 @@ There is currently no dedicated test target or test directory.
 - `make build-debug` builds the Debug configuration explicitly.
 - `make build-release` builds the Release configuration.
 - `make build-unsigned` builds with `CODE_SIGNING_ALLOWED=NO`, useful on machines without the project signing certificate.
+- `make test` runs the XCTest suite.
+- `make test-unsigned` runs tests with `CODE_SIGNING_ALLOWED=NO`, useful on machines without the project signing certificate.
 - `make clean` removes Xcode build products under `.build/DerivedData`.
 - `make open` opens the Xcode project.
 
@@ -36,7 +37,7 @@ Use Swift and SwiftUI conventions already present in `ContentView.swift`: 4-spac
 
 ## Testing Guidelines
 
-No automated test suite is currently configured. For changes to app logic, run `make build-unsigned` at minimum. For UI or profile-management changes, also verify the relevant workflow manually in Xcode or the built app. If adding tests later, prefer a standard Xcode test target and name tests after behavior, for example `testRenamingProfileAvoidsFileNameCollision`.
+Automated tests use XCTest in `CodexProfileSwitcherTests/`. For changes to app logic, run `make test-unsigned` at minimum. For UI or profile-management changes, also verify the relevant workflow manually in Xcode or the built app. Name tests after behavior, for example `testRepeatedApplyCreatesUniqueBackups`.
 
 ## Commit & Pull Request Guidelines
 

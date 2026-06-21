@@ -85,6 +85,7 @@ struct ProfileManagerView: View {
     @EnvironmentObject private var loginItemStore: LoginItemStore
     @EnvironmentObject private var store: ProfileStore
     @State private var selectedProfileID: UUID?
+    @State private var profilePendingDeletion: CodexProfile?
 
     private var selectedProfile: CodexProfile? {
         guard let selectedProfileID else { return store.profiles.first }
@@ -152,8 +153,7 @@ struct ProfileManagerView: View {
 
                     Button {
                         if let selectedProfile {
-                            store.delete(selectedProfile)
-                            selectedProfileID = store.profiles.first?.id
+                            profilePendingDeletion = selectedProfile
                         }
                     } label: {
                         Image(systemName: "trash")
@@ -210,6 +210,34 @@ struct ProfileManagerView: View {
             selectedProfileID = selectedProfileID ?? store.activeProfileID ?? store.profiles.first?.id
             loginItemStore.refresh()
         }
+        .confirmationDialog(
+            "Delete Profile?",
+            isPresented: Binding(
+                get: { profilePendingDeletion != nil },
+                set: { isPresented in
+                    if !isPresented {
+                        profilePendingDeletion = nil
+                    }
+                }
+            ),
+            presenting: profilePendingDeletion
+        ) { profile in
+            Button("Delete \(profile.name)", role: .destructive) {
+                store.delete(profile)
+                selectedProfileID = store.profiles.first?.id
+                profilePendingDeletion = nil
+            }
+
+            Button("Cancel", role: .cancel) {
+                profilePendingDeletion = nil
+            }
+        } message: { profile in
+            if profile.hasAuthSnapshot {
+                Text("This will permanently delete the profile and its saved Codex login.")
+            } else {
+                Text("This will permanently delete the profile.")
+            }
+        }
     }
 }
 
@@ -234,8 +262,8 @@ struct ProfileEditorView: View {
                         .font(.title3.weight(.semibold))
 
                     Button("Save") {
-                        store.update(profile, name: name, contents: contents)
-                        selectedProfileID = store.profiles.first { $0.name == name }?.id ?? profile.id
+                        let updated = store.update(profile, name: name, contents: contents)
+                        selectedProfileID = updated.id
                     }
                     .keyboardShortcut("s", modifiers: .command)
                     .disabled(!hasChanges || name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
@@ -393,13 +421,17 @@ final class ProfileStore: ObservableObject {
     private let stateURL: URL
     private let codexBundleIdentifier = "com.openai.codex"
     private let codexAppURL = URL(filePath: "/Applications/Codex.app", directoryHint: .isDirectory)
+    private let restartsCodexOnApply: Bool
 
     var statusSymbolName: String {
         activeProfileID == nil ? "person.crop.circle.badge.questionmark" : "person.crop.circle.badge.checkmark"
     }
 
-    init() {
-        let homeURL = FileManager.default.homeDirectoryForCurrentUser
+    init(
+        homeURL: URL = FileManager.default.homeDirectoryForCurrentUser,
+        bootstrap: Bool = true,
+        restartsCodexOnApply: Bool = true
+    ) {
         codexDirectoryURL = homeURL.appending(path: ".codex", directoryHint: .isDirectory)
         configURL = codexDirectoryURL.appending(path: "config.toml")
         authURL = codexDirectoryURL.appending(path: "auth.json")
@@ -412,10 +444,13 @@ final class ProfileStore: ObservableObject {
         stateURL = codexDirectoryURL
             .appending(path: "profile-switcher", directoryHint: .isDirectory)
             .appending(path: "state.json")
+        self.restartsCodexOnApply = restartsCodexOnApply
 
         ensureDirectories()
         reload()
-        bootstrapIfNeeded()
+        if bootstrap {
+            bootstrapIfNeeded()
+        }
     }
 
     func path(for profile: CodexProfile) -> URL {
@@ -474,6 +509,7 @@ final class ProfileStore: ObservableObject {
             }
             reload()
             lastMessage = "Saved \(cleanName)"
+            return profiles.first { $0.fileName == fileName } ?? updated
         } catch {
             lastMessage = "Could not save profile: \(error.localizedDescription)"
         }
@@ -531,7 +567,9 @@ final class ProfileStore: ObservableObject {
             activeProfileID = profile.id
             writeActiveProfileID(profile.id)
             lastMessage = "Applied \(profile.name). Restarting Codex..."
-            restartCodex()
+            if restartsCodexOnApply {
+                restartCodex()
+            }
         } catch {
             lastMessage = "Could not apply profile: \(error.localizedDescription)"
         }
@@ -687,9 +725,7 @@ final class ProfileStore: ObservableObject {
     private func ensureBackup() throws {
         guard FileManager.default.fileExists(atPath: configURL.path) else { return }
 
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyyMMdd-HHmmss"
-        let backupURL = codexDirectoryURL.appending(path: "config.toml.profile-switcher-backup-\(formatter.string(from: Date()))")
+        let backupURL = uniqueBackupURL(for: "config.toml")
         try FileManager.default.copyItem(at: configURL, to: backupURL)
         try setPrivatePermissions(on: backupURL)
     }
@@ -697,11 +733,24 @@ final class ProfileStore: ObservableObject {
     private func ensureAuthBackup() throws {
         guard FileManager.default.fileExists(atPath: authURL.path) else { return }
 
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyyMMdd-HHmmss"
-        let backupURL = codexDirectoryURL.appending(path: "auth.json.profile-switcher-backup-\(formatter.string(from: Date()))")
+        let backupURL = uniqueBackupURL(for: "auth.json")
         try FileManager.default.copyItem(at: authURL, to: backupURL)
         try setPrivatePermissions(on: backupURL)
+    }
+
+    private func uniqueBackupURL(for fileName: String) -> URL {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyyMMdd-HHmmss"
+        let baseName = "\(fileName).profile-switcher-backup-\(formatter.string(from: Date()))"
+        var backupURL = codexDirectoryURL.appending(path: baseName)
+        var index = 2
+
+        while FileManager.default.fileExists(atPath: backupURL.path) {
+            backupURL = codexDirectoryURL.appending(path: "\(baseName)-\(index)")
+            index += 1
+        }
+
+        return backupURL
     }
 
     private func applyAuthSnapshotIfAvailable(for profile: CodexProfile) throws {
