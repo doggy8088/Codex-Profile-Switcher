@@ -83,3 +83,7 @@ From the command line:
 ```sh
 xcodebuild -project "Codex Profile Switcher.xcodeproj" -scheme CodexProfileSwitcher -configuration Debug build
 ```
+
+## License
+
+MIT License. See [LICENSE](LICENSE).
