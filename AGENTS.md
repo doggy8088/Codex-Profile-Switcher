@@ -20,6 +20,8 @@ This repository contains a small macOS menu bar app built with SwiftUI and an Xc
 - `make build-debug` builds the Debug configuration explicitly.
 - `make build-release` builds the Release configuration.
 - `make build-unsigned` builds with `CODE_SIGNING_ALLOWED=NO`, useful on machines without the project signing certificate.
+- `make dmg` archives, exports, packages, signs, notarizes, staples, and verifies a Developer ID DMG. It expects local Apple credentials under `~/Documents/AppleCodeSigningCredentials` and the Developer ID identity in Keychain.
+- `make dmg-unsigned` builds a local unsigned DMG with the same Finder layout, without Developer ID signing or notarization.
 - `make test` runs the XCTest suite.
 - `make test-unsigned` runs tests with `CODE_SIGNING_ALLOWED=NO`, useful on machines without the project signing certificate.
 - `make clean` removes Xcode build products under `.build/DerivedData`.
