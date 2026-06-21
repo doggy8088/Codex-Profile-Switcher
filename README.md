@@ -99,6 +99,8 @@ Codex 會把目前登入狀態儲存在：
 make help
 make build-unsigned
 make test-unsigned
+make dmg
+make dmg-unsigned
 make clean
 ```
 
@@ -113,6 +115,22 @@ xcodebuild -project "Codex Profile Switcher.xcodeproj" -scheme CodexProfileSwitc
 ```sh
 xcodebuild -project "Codex Profile Switcher.xcodeproj" -scheme CodexProfileSwitcher -configuration Debug CODE_SIGNING_ALLOWED=NO build
 ```
+
+若要建立 Developer ID 簽署且已完成 Apple 公證的 DMG，請先確認本機 Keychain 已有 `Developer ID Application: Duotify Inc. (XKF69LC6US)`，且 `~/Documents/AppleCodeSigningCredentials/AuthKey_3X5KRBCA78.p8` 存在，然後執行：
+
+```sh
+make dmg
+```
+
+完成後產物會輸出到 `build/CodexProfilesSwitcher.dmg`，並產生 `build/CodexProfilesSwitcher.dmg.sha256`。
+
+若只需要本機測試用的 unsigned DMG，可執行：
+
+```sh
+make dmg-unsigned
+```
+
+產物會輸出到 `build/CodexProfilesSwitcher-unsigned.dmg`。此檔案不會進行 Developer ID 簽章、公證或 staple，不適合作為公開發行產物。
 
 ## 測試
 
