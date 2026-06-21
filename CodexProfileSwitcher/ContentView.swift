@@ -691,6 +691,7 @@ final class ProfileStore: ObservableObject {
         formatter.dateFormat = "yyyyMMdd-HHmmss"
         let backupURL = codexDirectoryURL.appending(path: "config.toml.profile-switcher-backup-\(formatter.string(from: Date()))")
         try FileManager.default.copyItem(at: configURL, to: backupURL)
+        try setPrivatePermissions(on: backupURL)
     }
 
     private func ensureAuthBackup() throws {
@@ -715,12 +716,15 @@ final class ProfileStore: ObservableObject {
     private func write(_ contents: String, to url: URL) throws {
         let temporaryURL = url.deletingLastPathComponent().appending(path: ".\(url.lastPathComponent).tmp")
         try contents.write(to: temporaryURL, atomically: true, encoding: .utf8)
+        try setPrivatePermissions(on: temporaryURL)
 
         if FileManager.default.fileExists(atPath: url.path) {
             _ = try FileManager.default.replaceItemAt(url, withItemAt: temporaryURL)
         } else {
             try FileManager.default.moveItem(at: temporaryURL, to: url)
         }
+
+        try setPrivatePermissions(on: url)
     }
 
     private func write(_ data: Data, to url: URL) throws {
@@ -743,14 +747,17 @@ final class ProfileStore: ObservableObject {
 
     private func uniqueName(_ baseName: String, excluding excludedID: UUID? = nil) -> String {
         let fallbackName = baseName.isEmpty ? "Profile" : baseName
-        let existingNames = Set(profiles.filter { $0.id != excludedID }.map(\.name))
+        let existingProfiles = profiles.filter { $0.id != excludedID }
+        let existingNames = Set(existingProfiles.map(\.name))
+        let existingFileNames = Set(existingProfiles.map(\.fileName))
 
-        if !existingNames.contains(fallbackName) {
+        if !existingNames.contains(fallbackName), !existingFileNames.contains(safeFileName(for: fallbackName)) {
             return fallbackName
         }
 
         var index = 2
-        while existingNames.contains("\(fallbackName) \(index)") {
+        while existingNames.contains("\(fallbackName) \(index)")
+            || existingFileNames.contains(safeFileName(for: "\(fallbackName) \(index)")) {
             index += 1
         }
 
