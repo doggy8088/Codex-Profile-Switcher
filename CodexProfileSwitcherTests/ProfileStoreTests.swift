@@ -1,5 +1,5 @@
 import XCTest
-@testable import Codex_Profiles
+@testable import CodexProfileSwitcher
 
 @MainActor
 final class ProfileStoreTests: XCTestCase {

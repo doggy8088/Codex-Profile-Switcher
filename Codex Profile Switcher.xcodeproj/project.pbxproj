@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		000000000000000000000120 /* Codex Profiles.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Codex Profiles.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		000000000000000000000120 /* CodexProfileSwitcher.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CodexProfileSwitcher.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		000000000000000000000220 /* CodexProfileSwitcherTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CodexProfileSwitcherTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -50,7 +50,7 @@
 		000000000000000000000020 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				000000000000000000000120 /* Codex Profiles.app */,
+				000000000000000000000120 /* CodexProfileSwitcher.app */,
 				000000000000000000000220 /* CodexProfileSwitcherTests.xctest */,
 			);
 			name = Products;
@@ -74,7 +74,7 @@
 			);
 			name = CodexProfileSwitcher;
 			productName = CodexProfileSwitcher;
-			productReference = 000000000000000000000120 /* Codex Profiles.app */;
+			productReference = 000000000000000000000120 /* CodexProfileSwitcher.app */;
 			productType = "com.apple.product-type.application";
 		};
 		000000000000000200000000 /* CodexProfileSwitcherTests */ = {
@@ -325,7 +325,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Codex Profiles";
+				INFOPLIST_KEY_CFBundleDisplayName = "Codex Profile Swicher";
 				INFOPLIST_KEY_LSUIElement = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -339,9 +339,9 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MARKETING_VERSION = 1.0.10;
+				MARKETING_VERSION = 1.0.11;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.jakobstadlhuber.codex-profiles";
-				PRODUCT_NAME = "Codex Profiles";
+				PRODUCT_NAME = CodexProfileSwitcher;
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = macosx;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -366,7 +366,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Codex Profiles";
+				INFOPLIST_KEY_CFBundleDisplayName = "Codex Profile Swicher";
 				INFOPLIST_KEY_LSUIElement = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -380,9 +380,9 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MARKETING_VERSION = 1.0.10;
+				MARKETING_VERSION = 1.0.11;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.jakobstadlhuber.codex-profiles";
-				PRODUCT_NAME = "Codex Profiles";
+				PRODUCT_NAME = CodexProfileSwitcher;
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = macosx;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -415,7 +415,7 @@
 				SDKROOT = macosx;
 				SUPPORTED_PLATFORMS = macosx;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Codex Profiles.app/Contents/MacOS/Codex Profiles";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CodexProfileSwitcher.app/Contents/MacOS/CodexProfileSwitcher";
 			};
 			name = Debug;
 		};
@@ -438,7 +438,7 @@
 				SDKROOT = macosx;
 				SUPPORTED_PLATFORMS = macosx;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Codex Profiles.app/Contents/MacOS/Codex Profiles";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CodexProfileSwitcher.app/Contents/MacOS/CodexProfileSwitcher";
 			};
 			name = Release;
 		};

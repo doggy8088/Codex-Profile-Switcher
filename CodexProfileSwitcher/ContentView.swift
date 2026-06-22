@@ -10,7 +10,7 @@ struct CodexProfileSwitcherApp: App {
     @StateObject private var store = ProfileStore()
 
     var body: some Scene {
-        MenuBarExtra("Codex Profiles", systemImage: store.statusSymbolName) {
+        MenuBarExtra("Codex Profile Swicher", systemImage: store.statusSymbolName) {
             ProfileMenuView()
                 .environmentObject(loginItemStore)
                 .environmentObject(store)
